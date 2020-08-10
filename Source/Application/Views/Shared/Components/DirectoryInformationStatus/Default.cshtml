@@ -1,0 +1,62 @@
+﻿@model DirectoryInformationStatusViewModel
+@if(Model.DirectoryInformation == null)
+{
+	<div class="alert alert-warning alert-dismissible fade show" role="alert">
+		<strong>No connection!</strong> You have not connected to the ldap-directory.
+		<button aria-label="Close" class="close" data-dismiss="alert" type="button">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<p>
+		<a aria-controls="connection-form" aria-expanded="false" class="btn btn-outline-dark" data-toggle="collapse" href="#connection-form" role="button">
+			Connection-form
+		</a>
+	</p>
+	<div class="collapse" id="connection-form">
+		<partial model="@Model.Form" name="~/Views/Shared/Forms/ConnectionForm.cshtml" />
+	</div>
+}
+else
+{
+	<div class="alert alert-success alert-dismissible fade show" role="alert">
+		<p>
+			<strong>You are connected to the ldap-directory!</strong>
+		</p>
+		<p>
+			<a aria-controls="connection-information" aria-expanded="false" class="btn btn-outline-success" data-toggle="collapse" href="#connection-information" role="button">
+				Information
+			</a>
+		</p>
+		<div class="collapse" id="connection-information">
+			<ul>
+				@if(Model.DirectoryInformation.Connection.Attributes.Any())
+				{
+					<li>Attributes: <strong>@string.Join(", ", Model.DirectoryInformation.Connection.Attributes)</strong></li>
+				}
+				<li>AuthenticationType: <strong>@Model.DirectoryInformation.Connection.AuthenticationType</strong></li>
+				<li>Duration to connect: <strong>@Model.DirectoryInformation.Connection.Duration</strong></li>
+				@if(!string.IsNullOrEmpty(Model.DirectoryInformation.Connection.Filter))
+				{
+					<li>Filter: <strong>@Model.DirectoryInformation.Connection.Filter</strong></li>
+				}
+				@if(Model.DirectoryInformation.Connection.Port != null)
+				{
+					<li>Port: <strong>@Model.DirectoryInformation.Connection.Port</strong></li>
+				}
+				<li>ProtocolVersion: <strong>@Model.DirectoryInformation.Connection.ProtocolVersion</strong></li>
+				<li>Root distinguished-name: <strong>@Model.DirectoryInformation.Connection.RootDistinguishedName</strong></li>
+				@if(Model.DirectoryInformation.Connection.Servers.Any())
+				{
+					<li>Servers: <strong>@string.Join(", ", Model.DirectoryInformation.Connection.Servers)</strong></li>
+				}
+				<li>Timeout: <strong>@Model.DirectoryInformation.Connection.Timeout</strong></li>
+				<li>Number of entries: <strong>@Model.DirectoryInformation.Entries.Count()</strong></li>
+			</ul>
+		</div>
+		<button aria-label="Close" class="close" data-dismiss="alert" type="button">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<partial name="~/Views/Shared/Forms/ClearDirectoryInformationForm.cshtml" />
+}
+<br />

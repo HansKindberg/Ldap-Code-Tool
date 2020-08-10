@@ -1,0 +1,42 @@
+﻿@model ObjectClassesViewModel
+@{ ViewBag.Heading = "Object classes"; }
+<h1 class="h4">@(Model.ObjectClass != null ? "Object-class: " + Model.ObjectClass.Value.Key : ViewBag.Heading)</h1>
+<hr />
+@if(Model.ObjectClass != null)
+{
+	if(Model.ObjectClass.Value.Value.Any())
+	{
+		<h2 class="h5">Attributes</h2>
+		<ul>
+			@foreach(var attribute in Model.ObjectClass.Value.Value)
+			{
+				<li>
+					<a asp-controller="Attributes" asp-route-id="@(attribute.Name)">@(attribute.Name)</a>
+				</li>
+			}
+		</ul>
+	}
+	else
+	{
+		<p>
+			<i>No attributes</i>
+		</p>
+	}
+}
+else if(Model.ObjectClasses.Any())
+{
+	<ul>
+		@foreach(var objectClass in Model.ObjectClasses)
+		{
+			<li>
+				<a asp-route-id="@(objectClass.Key)">@(objectClass.Key)</a>
+			</li>
+		}
+	</ul>
+}
+else
+{
+	<p>
+		<i>No object-classes</i>
+	</p>
+}

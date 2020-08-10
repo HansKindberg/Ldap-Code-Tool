@@ -1,0 +1,80 @@
+﻿@model EntriesViewModel
+@{ ViewBag.Heading = "Entries"; }
+<h1 class="h4">@(Model.EntryNode != null ? Model.EntryNode.Name() : ViewBag.Heading)</h1>
+<hr />
+@if(Model.EntryNode != null)
+{
+	if(Model.Ancestors.Any())
+	{
+		<div class="row">
+			<div class="col-md-12">
+				<h2 class="h5">Ancestors</h2>
+				<nav aria-label="breadcrumb">
+					<ol class="breadcrumb">
+						@foreach(var ancestor in Model.Ancestors.Reverse())
+						{
+							<li class="breadcrumb-item">
+								<a asp-route-id="@ancestor.Entry.DistinguishedName">@ancestor.Name()</a>
+							</li>
+						}
+						<li class="breadcrumb-item active" aria-current="page">@Model.EntryNode.Name()</li>
+					</ol>
+				</nav>
+			</div>
+		</div>
+	}
+	<div class="row">
+		<div class="col-md-8">
+			<p>Distinguished-name: <strong>@Model.EntryNode.Entry.DistinguishedName</strong></p>
+			@if(Model.EntryNode.Entry.Attributes.Any())
+			{
+				<h2 class="h5">Attributes</h2>
+				<ul>
+					@foreach(var (name, attribute) in Model.EntryNode.Entry.Attributes.OrderBy(item => item.Key))
+					{
+						var id = name.ToLowerInvariant().Replace(";", "-");
+						var values = attribute.GetValues(typeof(string)).Cast<string>().ToArray();
+						<li>
+							@if(values.Any())
+							{
+								<a aria-controls="@id" aria-expanded="false" data-toggle="collapse" href="#@id" role="button">
+									@(attribute.Name)
+								</a>
+								<ul class="collapse overflow-auto" id="@id">
+									@foreach(var value in values)
+									{
+										<li>@value</li>
+									}
+								</ul>
+							}
+							else
+							{
+								@(attribute.Name)
+							}
+						</li>
+					}
+				</ul>
+			}
+		</div>
+		<div class="col-md-4">
+			@if(Model.EntryNode.Children.Any())
+			{
+				<h2 class="h5">Children</h2>
+				<ul>
+					@foreach(var (distinguishedName, child) in Model.EntryNode.Children)
+					{
+						<li>
+							<a asp-route-id="@distinguishedName">@child.Name()</a>
+						</li>
+					}
+				</ul>
+			}
+		</div>
+	</div>
+}
+else
+{
+	<p>
+		<i>No entry</i>
+	</p>
+}

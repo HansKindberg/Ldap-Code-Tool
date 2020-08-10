@@ -1,0 +1,4 @@
+﻿<form asp-action="Clear" asp-controller="DirectoryInformation">
+	<input name="@nameof(ReturnForm.ReturnUrl)" type="hidden" value="@(Context.Request.Path + Context.Request.QueryString)" />
+	<button class="btn btn-outline-warning" type="submit">Disconnect</button>
+</form>

@@ -1,0 +1,48 @@
+﻿@inject IFacade Facade
+@{ var controller = ViewContext.RouteData.Values["controller"]; }
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="robots" content="noindex,nofollow" />
+		<title>@ViewBag.Heading - LDAP code-tool</title>
+		<link href="~/Style/Site.min.css" rel="stylesheet" />
+	</head>
+	<body>
+		<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+			<a class="navbar-brand" href="/">
+				<img alt="Logo" src="/Style/Images/logo-32x32.png" />
+			</a>
+			<button aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-target="#navigation" data-toggle="collapse" type="button">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navigation">
+				<ul class="navbar-nav">
+					<li class="nav-item">
+						<a class="nav-link@(controller.Equals("Home") ? " active" : string.Empty)" href="/">Home</a>
+					</li>
+					@if(Facade.DirectoryInformation != null)
+					{
+						<li class="nav-item">
+							<a class="nav-link@(controller.Equals("Entries") ? " active" : string.Empty)" href="/Entries/">Entries</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link@(controller.Equals("ObjectClasses") ? " active" : string.Empty)" href="/ObjectClasses/">Object-classes</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link@(controller.Equals("Attributes") ? " active" : string.Empty)" href="/Attributes/">Attributes</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link@(controller.Equals("Code") ? " active" : string.Empty)" href="/Code/">Code</a>
+						</li>
+					}
+				</ul>
+			</div>
+		</nav>
+		<main class="container-md mb-4" role="main">
+			@RenderBody()
+		</main>
+		<script src="~/Scripts/Site.min.js"></script>
+	</body>
+</html>

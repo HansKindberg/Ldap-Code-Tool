@@ -1,0 +1,40 @@
+﻿@model AttributesViewModel
+@{ ViewBag.Heading = "Attributes"; }
+<h1 class="h4">@(Model.Attribute != null ? "Attribute: " + Model.Attribute.Name : ViewBag.Heading)</h1>
+<hr />
+@if(Model.Attribute != null)
+{
+	var id = Model.Attribute.Name.ToLowerInvariant().Replace(";", "-");
+	<ul>
+		<li>Highest number of values: <strong>@Model.Attribute.HighestNumberOfValues</strong> <a asp-controller="Entries" asp-fragment="@id" asp-route-id="@Model.Attribute.HighestNumberOfValuesDistinguishedName" title="Eg. @Model.Attribute.HighestNumberOfValuesDistinguishedName">#</a></li>
+		<li>Longest total value-length: <strong>@Model.Attribute.LongestTotalValueLength</strong> <a asp-controller="Entries" asp-fragment="@id" asp-route-id="@Model.Attribute.LongestTotalValueLengthDistinguishedName" title="Eg. @Model.Attribute.LongestTotalValueLengthDistinguishedName">#</a></li>
+		<li>
+			Exists on the following object-classes:
+			<ul>
+				@foreach(var objectClass in Model.Attribute.ObjectClassesThatThisAttributeExistsAt)
+				{
+					<li>
+						<a asp-controller="ObjectClasses" asp-route-id="@objectClass">@objectClass</a>
+					</li>
+				}
+			</ul>
+		</li>
+	</ul>
+}
+else if(Model.Attributes.Any())
+{
+	<ul>
+		@foreach(var attribute in Model.Attributes)
+		{
+			<li>
+				<a asp-route-id="@(attribute.Key)">@(attribute.Key)</a>
+			</li>
+		}
+	</ul>
+}
+else
+{
+	<p>
+		<i>No attributes</i>
+	</p>
+}

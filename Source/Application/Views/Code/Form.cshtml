@@ -1,0 +1,36 @@
+﻿@model CodeOptionsForm
+<form asp-action="Create">
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			<label asp-for="ObjectClasses">Object-classes</label>
+			<select asp-for="ObjectClasses" asp-items="@Model.ObjectClassOptions" class="form-control"></select>
+			<small class="form-text text-muted">Select one or more object-classes.</small>
+		</div>
+		<div class="form-group col-md-6">
+			<label asp-for="UninterestingAttributes">Uninteresting attributes</label>
+			<select asp-for="UninterestingAttributes" asp-items="@Model.UninterestingAttributeOptions" class="form-control"></select>
+			<small class="form-text text-muted">Select one or more attributes to exclude from code.</small>
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-4">
+			<label asp-for="CodeType">Code-types</label>
+			<select asp-for="CodeType" asp-items="@Model.CodeTypeOptions" class="form-control"></select>
+		</div>
+		<div class="form-group col-md-4">
+			<label asp-for="TypeStructure">Type-structure</label>
+			<select asp-for="TypeStructure" asp-items="@Model.TypeStructureOptions" class="form-control"></select>
+		</div>
+		<div class="form-group col-md-4">
+			<label asp-for="BaseTypeName">Base-type name</label>
+			<input asp-for="BaseTypeName" class="form-control" />
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="form-check">
+			<input asp-for="MultiValueProperties" class="form-check-input" type="checkbox" />
+			<label asp-for="MultiValueProperties" class="form-check-label">Multi-value properties (IEnumerable&lt;string&gt;)</label>
+		</div>
+	</div>
+	<button class="btn btn-outline-success" type="submit">Create</button>
+</form>
