@@ -34,15 +34,17 @@ namespace Application.Models.Code
 
 		#region Methods
 
-		protected internal virtual CodeAttributeDeclaration CreateCodeAttributeDeclaration(string argument, string name)
+		protected internal virtual CodeAttributeDeclaration CreateCodeAttributeDeclaration(string name, string argument = null)
 		{
-			if(argument == null)
-				throw new ArgumentNullException(nameof(argument));
-
 			if(name == null)
 				throw new ArgumentNullException(nameof(name));
 
-			return new CodeAttributeDeclaration(name, new CodeAttributeArgument(new CodeVariableReferenceExpression(argument)));
+			var arguments = new List<CodeAttributeArgument>();
+
+			if(argument != null)
+				arguments.Add(new CodeAttributeArgument(new CodeVariableReferenceExpression(argument)));
+
+			return new CodeAttributeDeclaration(name, arguments.ToArray());
 		}
 
 		protected internal virtual CodeDomProvider CreateCodeDomProvider()
@@ -319,7 +321,7 @@ namespace Application.Models.Code
 				if(!item.Patterns.Any(pattern => attribute.Name.Like(pattern)))
 					continue;
 
-				propertyAttributes.Add(this.CreateCodeAttributeDeclaration(item.Argument, item.Name));
+				propertyAttributes.Add(this.CreateCodeAttributeDeclaration(item.Name, item.Argument));
 
 				if(item.Name.Equals(maxLengthAttributeName, StringComparison.OrdinalIgnoreCase))
 					maxLengthAttributeAdded = true;
@@ -341,7 +343,7 @@ namespace Application.Models.Code
 				}
 
 				if(maxLengthArgument != null)
-					propertyAttributes.Add(this.CreateCodeAttributeDeclaration(maxLengthArgument.Value.ToString(CultureInfo.InvariantCulture), maxLengthAttributeName));
+					propertyAttributes.Add(this.CreateCodeAttributeDeclaration(maxLengthAttributeName, maxLengthArgument.Value.ToString(CultureInfo.InvariantCulture)));
 			}
 
 			foreach(var propertyAttribute in propertyAttributes.OrderBy(propertyAttribute => propertyAttribute.Name))
