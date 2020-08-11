@@ -76,7 +76,7 @@ namespace Application.Models.Code
 				codeTypeDeclaration.IsClass = true;
 			}
 
-			var options = this.Options.Value;
+			var codeOptions = this.Options.Value;
 
 			foreach(var attribute in attributes ?? Enumerable.Empty<IAttributeInformation>())
 			{
@@ -88,7 +88,7 @@ namespace Application.Models.Code
 					Type = customOptions.MultiValueProperties ? new CodeTypeReference("IEnumerable<string>") : new CodeTypeReference(typeof(string))
 				};
 
-				if(options.Summaries.TryGetValue(attribute.Name, out var summary))
+				if(codeOptions.Summaries.TryGetValue(attribute.Name, out var summary))
 				{
 					// https://docs.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/how-to-create-an-xml-documentation-file-using-codedom?redirectedfrom=MSDN
 					codeMemberProperty.Comments.Add(new CodeCommentStatement("<summary>", true));
@@ -133,17 +133,17 @@ namespace Application.Models.Code
 			{
 				using(var codeDomProvider = this.CreateCodeDomProvider())
 				{
-					var options = this.Options.Value;
+					var codeOptions = this.Options.Value;
 
 					foreach(var codeTypeDeclaration in codeTypeDeclarations)
 					{
-						codeDomProvider.GenerateCodeFromType(codeTypeDeclaration, stringWriter, options.Generation);
+						codeDomProvider.GenerateCodeFromType(codeTypeDeclaration, stringWriter, codeOptions.Generation);
 					}
 
 					var code = stringWriter.ToString();
 
 					// ReSharper disable LoopCanBeConvertedToQuery
-					foreach(var (key, value) in this.Options.Value.Replacements)
+					foreach(var (key, value) in codeOptions.Replacements)
 					{
 						code = code.Replace(key, value, StringComparison.Ordinal);
 					}
@@ -157,7 +157,7 @@ namespace Application.Models.Code
 
 		protected internal virtual IEnumerable<IAttributeInformation> GetAllAttributes(ICustomCodeOptions customOptions, IDirectoryInformation directoryInformation, IEnumerable<string> objectClasses)
 		{
-			return this.GetInterestingAttributes((directoryInformation?.Attributes ?? new Dictionary<string, IAttributeInformation>()).Values.Where(attribute => (objectClasses ?? Enumerable.Empty<string>()).Intersect(attribute.ObjectClassesThatThisAttributeExistsAt).Any()), customOptions);
+			return this.GetSelectedAttributes((directoryInformation?.Attributes ?? new Dictionary<string, IAttributeInformation>()).Values.Where(attribute => (objectClasses ?? Enumerable.Empty<string>()).Intersect(attribute.ObjectClassesThatThisAttributeExistsAt).Any()), customOptions);
 		}
 
 		[SuppressMessage("Maintainability", "CA1502:Avoid excessive complexity")]
@@ -231,7 +231,7 @@ namespace Application.Models.Code
 					{
 						if(directoryInformation.ObjectClasses.TryGetValue(objectClass, out var attributes))
 						{
-							attributes = this.GetInterestingAttributes(attributes, customOptions).Where(attribute => !commonAttributes.Any(commonAttribute => commonAttribute.Name.Equals(attribute.Name, StringComparison.OrdinalIgnoreCase))).ToArray();
+							attributes = this.GetSelectedAttributes(attributes, customOptions).Where(attribute => !commonAttributes.Any(commonAttribute => commonAttribute.Name.Equals(attribute.Name, StringComparison.OrdinalIgnoreCase))).ToArray();
 
 							var className = this.EnsureAlphanumericAndUnderscoreCharactersOnly(objectClass.FirstLetterToUpperInvariant());
 							var classBaseTypes = new List<string>();
@@ -284,10 +284,15 @@ namespace Application.Models.Code
 
 		protected internal virtual IEnumerable<IAttributeInformation> GetCommonAttributes(ICustomCodeOptions customOptions, IDirectoryInformation directoryInformation, IEnumerable<string> objectClasses)
 		{
-			return this.GetInterestingAttributes((directoryInformation?.Attributes ?? new Dictionary<string, IAttributeInformation>()).Values.Where(attribute => !(objectClasses ?? Enumerable.Empty<string>()).Except(attribute.ObjectClassesThatThisAttributeExistsAt).Any()), customOptions);
+			return this.GetSelectedAttributes((directoryInformation?.Attributes ?? new Dictionary<string, IAttributeInformation>()).Values.Where(attribute => !(objectClasses ?? Enumerable.Empty<string>()).Except(attribute.ObjectClassesThatThisAttributeExistsAt).Any()), customOptions);
 		}
 
-		protected internal virtual IEnumerable<IAttributeInformation> GetInterestingAttributes(IEnumerable<IAttributeInformation> attributes, ICustomCodeOptions customOptions)
+		protected internal virtual string GetInterfaceName(string name)
+		{
+			return $"I{name}";
+		}
+
+		protected internal virtual IEnumerable<IAttributeInformation> GetSelectedAttributes(IEnumerable<IAttributeInformation> attributes, ICustomCodeOptions customOptions)
 		{
 			if(attributes == null)
 				throw new ArgumentNullException(nameof(attributes));
@@ -295,12 +300,7 @@ namespace Application.Models.Code
 			if(customOptions == null)
 				throw new ArgumentNullException(nameof(customOptions));
 
-			return attributes.Where(attribute => !(customOptions.UninterestingAttributes ?? Enumerable.Empty<string>()).Contains(attribute.Name, StringComparer.OrdinalIgnoreCase));
-		}
-
-		protected internal virtual string GetInterfaceName(string name)
-		{
-			return $"I{name}";
+			return attributes.Where(attribute => (customOptions.Attributes ?? Enumerable.Empty<string>()).Contains(attribute.Name, StringComparer.OrdinalIgnoreCase));
 		}
 
 		protected internal virtual void PopulatePropertyAttributes(IAttributeInformation attribute, CodeMemberProperty codeMemberProperty)

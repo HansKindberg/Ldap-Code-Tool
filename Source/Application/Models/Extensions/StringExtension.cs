@@ -49,6 +49,9 @@ namespace Application.Models.Extensions
 			if(pattern == null)
 				throw new ArgumentNullException(nameof(pattern));
 
+			if(!pattern.Contains('*', StringComparison.Ordinal))
+				return value.Equals(pattern, StringComparison.OrdinalIgnoreCase);
+
 			const RegexOptions regexOptions = RegexOptions.Compiled | RegexOptions.IgnoreCase;
 
 			var regexPattern = "^" + Regex.Escape(pattern).Replace("\\*", ".*", StringComparison.Ordinal) + "$";

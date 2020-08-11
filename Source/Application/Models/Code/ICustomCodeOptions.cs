@@ -6,12 +6,12 @@ namespace Application.Models.Code
 	{
 		#region Properties
 
+		IEnumerable<string> Attributes { get; set; }
 		string BaseTypeName { get; set; }
 		CodeType CodeType { get; set; }
 		bool MultiValueProperties { get; set; }
 		IEnumerable<string> ObjectClasses { get; set; }
 		TypeStructure TypeStructure { get; set; }
-		IEnumerable<string> UninterestingAttributes { get; set; }
 
 		#endregion
 	}
